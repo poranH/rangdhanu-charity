@@ -8,12 +8,12 @@
     <meta name="apple-mobile-web-app-status-bar-style" content="default">
     <title>Rangdhanu Charity Fund Tracker</title>
     
-    <!-- Firebase SDK -->
     <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-firestore-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-auth-compat.js"></script>
     
     <style>
+        /* Base Styles */
         * {
             margin: 0;
             padding: 0;
@@ -37,6 +37,7 @@
             overflow: hidden;
         }
 
+        /* Mobile Responsive Adjustments */
         @media (max-width: 768px) {
             body {
                 padding: 10px;
@@ -125,6 +126,7 @@
             }
         }
 
+        /* Desktop Optimizations */
         @media (min-width: 1200px) {
             .container {
                 margin: 20px auto;
@@ -135,6 +137,7 @@
             }
         }
 
+        /* Existing Styles */
         .header {
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             color: white;
@@ -671,17 +674,12 @@
             left: 0;
             width: 100%;
             height: 100%;
-            background: rgba(0,0,0,0.8);
-            z-index: 9999;
+            background: rgba(0,0,0,0.7);
+            z-index: 2000;
             align-items: center;
             justify-content: center;
             color: white;
             font-size: 1.2em;
-            flex-direction: column;
-        }
-
-        .loading-overlay.active {
-            display: flex;
         }
 
         .loading-spinner {
@@ -703,24 +701,11 @@
             position: fixed;
             bottom: 20px;
             right: 20px;
-            padding: 12px 20px;
-            border-radius: 8px;
+            padding: 10px 15px;
+            border-radius: 5px;
             font-size: 0.9em;
-            z-index: 1000;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.3);
-            display: none;
-        }
-
-        .sync-status.show {
-            display: block;
-            animation: fadeInOut 5s ease-in-out;
-        }
-
-        @keyframes fadeInOut {
-            0% { opacity: 0; transform: translateY(20px); }
-            10% { opacity: 1; transform: translateY(0); }
-            90% { opacity: 1; transform: translateY(0); }
-            100% { opacity: 0; transform: translateY(-20px); }
+            z-index: 100;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.2);
         }
 
         .sync-success {
@@ -736,16 +721,6 @@
         .sync-pending {
             background: #ffc107;
             color: black;
-        }
-
-        .sync-online {
-            background: #28a745;
-            color: white;
-        }
-
-        .sync-offline {
-            background: #dc3545;
-            color: white;
         }
 
         .finance-summary {
@@ -805,6 +780,7 @@
             color: #495057;
         }
         
+        /* Hide admin controls when not logged in */
         .admin-only {
             display: none;
         }
@@ -815,14 +791,14 @@
     </style>
 </head>
 <body>
-    <div class="loading-overlay" id="loadingOverlay">
+    <div class="loading-overlay" id="loadingOverlay" style="display: flex;">
         <div style="text-align: center;">
             <div class="loading-spinner"></div>
-            <div id="loadingText">Initializing Firebase...</div>
+            <div id="loadingText">Loading...</div>
         </div>
     </div>
 
-    <div class="sync-status" id="syncStatus"></div>
+    <div class="sync-status" id="syncStatus" style="display: none;"></div>
 
     <div class="container">
         <div class="header">
@@ -844,7 +820,6 @@
             <button class="tab" onclick="switchTab('logs')">📋 Activity Logs</button>
         </div>
 
-        <!-- Collection Tab -->
         <div id="collection" class="tab-content active">
             <div class="export-options">
                 <button class="add-member-btn admin-only" id="addMemberBtn" onclick="showAddMemberModal()">+ Add New Member</button>
@@ -873,8 +848,7 @@
             </div>
 
             <div id="yearsContainer">
-                <!-- Years will be dynamically added here -->
-            </div>
+                </div>
 
             <h3 style="margin: 30px 0 15px 0;">One-Time Public Donations</h3>
             <div class="table-container">
@@ -897,7 +871,6 @@
             </div>
         </div>
 
-        <!-- Dashboard Tab -->
         <div id="dashboard" class="tab-content">
             <div class="summary-grid">
                 <div class="summary-card">
@@ -929,7 +902,6 @@
             </div>
         </div>
 
-        <!-- Reports Tab -->
         <div id="reports" class="tab-content">
             <div class="summary-grid">
                 <div class="summary-card clickable-header" onclick="toggleMemberList('paid')">
@@ -944,12 +916,12 @@
                 </div>
             </div>
 
-            <div id="paidListSection">
+            <div id="paidListSection" style="display: none;">
                 <h3 style="margin: 20px 0 15px 0;">Paid Members List</h3>
                 <div class="member-list" id="paidList"></div>
             </div>
 
-            <div id="dueListSection">
+            <div id="dueListSection" style="display: none;">
                 <h3 style="margin: 20px 0 15px 0;">Due Members List</h3>
                 <div class="member-list" id="dueList"></div>
             </div>
@@ -971,7 +943,6 @@
             </div>
         </div>
 
-        <!-- Finance Tab -->
         <div id="finance" class="tab-content">
             <div class="finance-summary">
                 <div class="finance-card income">
@@ -1014,18 +985,15 @@
             </div>
         </div>
 
-        <!-- Activity Logs Tab -->
         <div id="logs" class="tab-content">
             <h3 style="margin-bottom: 20px;">Admin Activity Logs</h3>
             <div class="table-container">
                 <div id="activityLogs">
-                    <!-- Activity logs will be dynamically added here -->
-                </div>
+                    </div>
             </div>
         </div>
     </div>
 
-    <!-- Admin Login Modal -->
     <div id="loginModal" class="modal">
         <div class="modal-content">
             <h3>🔐 Admin Login - Rangdhanu Charity Fund</h3>
@@ -1044,7 +1012,6 @@
         </div>
     </div>
 
-    <!-- Add Expense Modal -->
     <div id="addExpenseModal" class="modal">
         <div class="modal-content">
             <h3>➕ Add New Expense</h3>
@@ -1077,7 +1044,6 @@
         </div>
     </div>
 
-    <!-- Export Modal -->
     <div id="exportModal" class="modal">
         <div class="modal-content">
             <h3>📤 Export Data - Rangdhanu Charity Fund</h3>
@@ -1110,7 +1076,6 @@
         </div>
     </div>
 
-    <!-- Manage Modal -->
     <div id="manageModal" class="modal">
         <div class="modal-content">
             <h3>⚙️ System Management</h3>
@@ -1125,7 +1090,6 @@
         </div>
     </div>
 
-    <!-- Add Member Modal -->
     <div id="addMemberModal" class="modal">
         <div class="modal-content">
             <h3>➕ Add New Member</h3>
@@ -1148,7 +1112,6 @@
         </div>
     </div>
 
-    <!-- Add Donation Modal -->
     <div id="donationModal" class="modal">
         <div class="modal-content">
             <h3>+ Record New Public Donation</h3>
@@ -1175,7 +1138,6 @@
         </div>
     </div>
 
-    <!-- Manage Members Modal -->
     <div id="manageMembersModal" class="modal">
         <div class="modal-content">
             <h3>👥 Manage Members</h3>
@@ -1200,7 +1162,6 @@
         </div>
     </div>
 
-    <!-- Add Year Modal -->
     <div id="addYearModal" class="modal">
         <div class="modal-content">
             <h3>➕ Add New Year</h3>
@@ -1215,7 +1176,6 @@
         </div>
     </div>
 
-    <!-- Manage Years Modal -->
     <div id="manageYearsModal" class="modal">
         <div class="modal-content">
             <h3>📅 Manage Years</h3>
@@ -1238,7 +1198,6 @@
         </div>
     </div>
 
-    <!-- Backup Modal -->
     <div id="backupModal" class="modal">
         <div class="modal-content">
             <h3>💾 Backup Data</h3>
@@ -1252,7 +1211,6 @@
         </div>
     </div>
 
-    <!-- Restore Modal -->
     <div id="restoreModal" class="modal">
         <div class="modal-content">
             <h3>🔄 Restore Data</h3>
@@ -1269,7 +1227,6 @@
         </div>
     </div>
 
-    <!-- Custom Dialog Modal -->
     <div id="customDialogModal" class="modal">
         <div class="modal-content">
             <h3 id="dialogTitle">Dialog</h3>
@@ -1281,96 +1238,72 @@
         </div>
     </div>
 
-    <!-- Scripts -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.9.1/chart.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.28/jspdf.plugin.autotable.min.js"></script>
     
     <script>
-        // ========== FIREBASE CONFIGURATION ==========
-        const firebaseConfig = {
-            apiKey: "AIzaSyDChxV-zUTEMK_Oe1xJVn123c8l7fonhDk",
-            authDomain: "rangdhanu-1bdec.firebaseapp.com",
-            projectId: "rangdhanu-1bdec",
-            storageBucket: "rangdhanu-1bdec.firebasestorage.app",
-            messagingSenderId: "842682768144",
-            appId: "1:842682768144:web:ba7cdfbab05e0b7bd52395",
-            measurementId: "G-P3YGK1TF48"
-        };
+        // Firebase Configuration - ACTUAL CONFIG
+		// For Firebase JS SDK v7.20.0 and later, measurementId is optional
+		const firebaseConfig = {
+		  apiKey: "AIzaSyDChxV-zUTEMK_Oe1xJVn123c8l7fonhDk",
+		  authDomain: "rangdhanu-1bdec.firebaseapp.com",
+		  projectId: "rangdhanu-1bdec",
+		  storageBucket: "rangdhanu-1bdec.firebasestorage.app",
+		  messagingSenderId: "842682768144",
+		  appId: "1:842682768144:web:ba7cdfbab05e0b7bd52395",
+		  measurementId: "G-P3YGK1TF48"
+		};
 
-        // ========== PROPER FIREBASE INITIALIZATION ==========
-        function initializeFirebaseApp() {
-            try {
-                if (!firebase.apps.length) {
-                    firebase.initializeApp(firebaseConfig);
-                    console.log("Firebase initialized successfully");
-                } else {
-                    firebase.app();
-                    console.log("Firebase already initialized");
-                }
-                return firebase.app();
-            } catch (error) {
-                console.error("Firebase initialization error:", error);
-                throw error;
-            }
-        }
-
-        // Initialize Firebase services
-        const app = initializeFirebaseApp();
+        // Initialize Firebase
+        firebase.initializeApp(firebaseConfig);
         const db = firebase.firestore();
         const auth = firebase.auth();
 
-        // ========== OFFLINE PERSISTENCE CONFIGURATION ==========
-        async function enableOfflinePersistence() {
-            try {
-                await db.enablePersistence()
-                    .catch(err => {
-                        if (err.code === 'failed-precondition') {
-                            console.warn('Offline persistence failed - multiple tabs open');
-                        } else if (err.code === 'unimplemented') {
-                            console.warn('Offline persistence not supported by browser');
-                        }
-                    });
-                console.log("Offline persistence enabled");
-            } catch (error) {
-                console.warn("Offline persistence error:", error);
-            }
-        }
-
-        // ========== OPTIMIZED DATA STRUCTURE ==========
+        // Enhanced data structure with Firebase integration
         let appData = {
             organization: "Rangdhanu Charity Fund",
-            appVersion: "4.4",
+            appVersion: "4.1",
+            years: {}, // Initialize as empty, will be loaded from Firebase
+            members: [], // Initialize as empty, will be loaded from Firebase
+            payments: {}, // Initialize as empty, will be loaded from Firebase
+            donations: [], // Initialize as empty, will be loaded from Firebase
+            expenses: [], // Initialize as empty, will be loaded from Firebase
+            activityLogs: [],
             settings: {
                 admins: {
                     "Ful Mia": "admin123",
                     "Shah Paran": "super123"
                 },
                 currentAdmin: null,
-                isAuthenticated: false
+                isAuthenticated: false,
+                adminContacts: [
+                    { name: 'Admin 1', phone: '+8801712345678', email: 'admin1@rangdhanu.org' },
+                    { name: 'Admin 2', phone: '+8801812345678', email: 'admin2@rangdhanu.org' }
+                ]
             }
         };
 
-        let members = [];
-        let years = {};
-        let payments = {};
-        let donations = [];
-        let expenses = [];
-        let activityLogs = [];
-
         let monthlyChart, contributorsChart, financeChart;
         let isOnline = navigator.onLine;
-        let firebaseInitialized = true;
 
-        // ========== ENHANCED FIREBASE DATA MANAGEMENT ==========
-        async function initializeAppData() {
-            showLoading('Connecting to Firebase...');
-            
+        // ========== FIREBASE DATA MANAGEMENT ==========
+
+        async function initializeFirebase() {
+            showLoading('Connecting to database...');
             try {
-                await enableOfflinePersistence();
-                await loadAllDataWithListeners();
+                // Load settings first (no need to await, it's small)
+                const settingsDoc = await db.collection('settings').doc('appSettings').get();
+                if (settingsDoc.exists) {
+                    const settingsData = settingsDoc.data();
+                    appData.settings = { ...appData.settings, ...settingsData };
+                }
+
+                // Load all other data
+                await loadAllData();
                 
+                // Initialize the rest of the app only after ALL data is loaded
                 initializePayments();
                 renderYears();
                 renderDonations();
@@ -1378,273 +1311,193 @@
                 updateDashboard();
                 updateReports();
                 updateFinance();
+                updateDateRange();
                 updateLoginStatus();
-                
+                updateAdminControls();
+
                 hideLoading();
-                showSyncStatus('✅ Connected to Firebase successfully!', 'online');
-                
+                showSyncStatus('Connected to cloud database!', 'success');
             } catch (error) {
-                console.error('App initialization failed:', error);
+                console.error('Firebase initialization error:', error);
                 hideLoading();
-                showSyncStatus('❌ Firebase connection failed', 'offline');
-                initializeWithDefaultData();
+                // Fallback rendering even if data load failed (it will be empty or use defaults)
+                renderYears();
+                renderDonations();
+                renderExpenses();
+                updateDashboard();
+                updateReports();
+                updateFinance();
+                updateDateRange();
+                updateLoginStatus();
+                updateAdminControls();
+
+                showCustomAlert('❌ Could not load all data from Firebase. Check console for details.', 'Database Error', 'danger');
+                showSyncStatus('Using initial offline data', 'error');
             }
         }
 
-        // ========== REAL-TIME DATA LISTENERS ==========
-        function setupRealtimeListeners() {
-            // Members collection listener
-            db.collection('members').onSnapshot(snapshot => {
-                members = [];
-                snapshot.forEach(doc => {
-                    members.push({ id: doc.id, ...doc.data() });
-                });
-                members.sort((a, b) => a.id - b.id);
-                renderYears();
-                updateDashboard();
-            }, error => {
-                console.error('Members listener error:', error);
-            });
-
-            // Years collection listener
-            db.collection('years').onSnapshot(snapshot => {
-                years = {};
-                snapshot.forEach(doc => {
-                    years[doc.id] = doc.data();
-                });
-                renderYears();
-                updateDashboard();
-            });
-
-            // Payments collection listener
-            db.collection('payments').onSnapshot(snapshot => {
-                payments = {};
-                snapshot.forEach(doc => {
-                    payments[doc.id] = doc.data();
-                });
-                renderYears();
-                updateDashboard();
-            });
-
-            // Donations collection listener
-            db.collection('donations')
-                .orderBy('date', 'desc')
-                .onSnapshot(snapshot => {
-                    donations = [];
-                    snapshot.forEach(doc => {
-                        donations.push({ id: doc.id, ...doc.data() });
-                    });
-                    renderDonations();
-                    updateDashboard();
-                    updateFinance();
-                });
-
-            // Expenses collection listener
-            db.collection('expenses')
-                .orderBy('date', 'desc')
-                .onSnapshot(snapshot => {
-                    expenses = [];
-                    snapshot.forEach(doc => {
-                        expenses.push({ id: doc.id, ...doc.data() });
-                    });
-                    renderExpenses();
-                    updateFinance();
-                });
-
-            // Activity logs listener
-            db.collection('activityLogs')
-                .orderBy('timestamp', 'desc')
-                .limit(100)
-                .onSnapshot(snapshot => {
-                    activityLogs = [];
-                    snapshot.forEach(doc => {
-                        activityLogs.push({ id: doc.id, ...doc.data() });
-                    });
-                    if (document.getElementById('logs').classList.contains('active')) {
-                        renderActivityLogs();
-                    }
-                });
-        }
-
-        async function loadAllDataWithListeners() {
+        async function loadAllData() {
             try {
-                setupRealtimeListeners();
-                
-                const [membersSnapshot, yearsSnapshot, paymentsSnapshot, donationsSnapshot, expensesSnapshot, logsSnapshot] = await Promise.all([
-                    db.collection('members').get(),
+                // Use Promise.all to fetch all collections concurrently
+                const [
+                    yearsSnapshot,
+                    membersSnapshot,
+                    paymentsSnapshot,
+                    donationsSnapshot,
+                    expensesSnapshot,
+                    logsSnapshot
+                ] = await Promise.all([
                     db.collection('years').get(),
+                    db.collection('members').get(),
                     db.collection('payments').get(),
-                    db.collection('donations').orderBy('date', 'desc').get(),
-                    db.collection('expenses').orderBy('date', 'desc').get(),
-                    db.collection('activityLogs').orderBy('timestamp', 'desc').limit(100).get()
+                    db.collection('donations').get(),
+                    db.collection('expenses').get(),
+                    db.collection('activityLogs').orderBy('timestamp', 'desc').limit(1000).get()
                 ]);
 
-                // Process members
-                members = [];
-                membersSnapshot.forEach(doc => {
-                    members.push({ id: doc.id, ...doc.data() });
-                });
-                members.sort((a, b) => a.id - b.id);
-
                 // Process years
-                years = {};
-                yearsSnapshot.forEach(doc => {
-                    years[doc.id] = doc.data();
-                });
-
-                // Process payments
-                payments = {};
-                paymentsSnapshot.forEach(doc => {
-                    payments[doc.id] = doc.data();
-                });
-
-                // Process donations
-                donations = [];
-                donationsSnapshot.forEach(doc => {
-                    donations.push({ id: doc.id, ...doc.data() });
-                });
-
-                // Process expenses
-                expenses = [];
-                expensesSnapshot.forEach(doc => {
-                    expenses.push({ id: doc.id, ...doc.data() });
-                });
-
-                // Process activity logs
-                activityLogs = [];
-                logsSnapshot.forEach(doc => {
-                    activityLogs.push({ id: doc.id, ...doc.data() });
-                });
-
-                if (membersSnapshot.empty && yearsSnapshot.empty) {
-                    await initializeWithDefaultData();
+                appData.years = {};
+                if (!yearsSnapshot.empty) {
+                    yearsSnapshot.forEach(doc => {
+                        appData.years[doc.id] = doc.data();
+                    });
                 }
 
+                // Process members - important to sort by ID for consistent rendering
+                appData.members = [];
+                if (!membersSnapshot.empty) {
+                    membersSnapshot.forEach(doc => {
+                        appData.members.push({ id: parseInt(doc.id), ...doc.data() });
+                    });
+                    appData.members.sort((a, b) => a.id - b.id);
+                }
+
+                // Process payments
+                appData.payments = {};
+                if (!paymentsSnapshot.empty) {
+                    paymentsSnapshot.forEach(doc => {
+                        appData.payments[doc.id] = doc.data();
+                    });
+                }
+
+                // Process donations
+                appData.donations = [];
+                if (!donationsSnapshot.empty) {
+                    donationsSnapshot.forEach(doc => {
+                        appData.donations.push({ id: doc.id, ...doc.data() });
+                    });
+                }
+
+                // Process expenses
+                appData.expenses = [];
+                if (!expensesSnapshot.empty) {
+                    expensesSnapshot.forEach(doc => {
+                        appData.expenses.push({ id: doc.id, ...doc.data() });
+                    });
+                }
+
+                // Process activity logs
+                appData.activityLogs = [];
+                if (!logsSnapshot.empty) {
+                    logsSnapshot.forEach(doc => {
+                        appData.activityLogs.push(doc.data());
+                    });
+                }
             } catch (error) {
-                console.error('Error loading initial data:', error);
+                console.error('Error loading data:', error);
                 throw error;
             }
         }
 
-        async function initializeWithDefaultData() {
-            console.log('Initializing default data structure...');
-            
-            const defaultYears = {
-                "2025": {
-                    months: ['Nov 2025', 'Dec 2025'],
-                    monthDates: [
-                        '2025-11-01T00:00:00.000Z', 
-                        '2025-12-01T00:00:00.000Z'
-                    ]
-                },
-                "2026": {
-                    months: ['Jan 2026', 'Feb 2026', 'Mar 2026', 'Apr 2026', 'May 2026', 'Jun 2026', 
-                            'Jul 2026', 'Aug 2026', 'Sep 2026', 'Oct 2026', 'Nov 2026', 'Dec 2026'],
-                    monthDates: [
-                        '2026-01-01T00:00:00.000Z', 
-                        '2026-02-01T00:00:00.000Z', 
-                        '2026-03-01T00:00:00.000Z',
-                        '2026-04-01T00:00:00.000Z', 
-                        '2026-05-01T00:00:00.000Z', 
-                        '2026-06-01T00:00:00.000Z',
-                        '2026-07-01T00:00:00.000Z', 
-                        '2026-08-01T00:00:00.000Z', 
-                        '2026-09-01T00:00:00.000Z',
-                        '2026-10-01T00:00:00.000Z', 
-                        '2026-11-01T00:00:00.000Z', 
-                        '2026-12-01T00:00:00.000Z'
-                    ]
-                }
-            };
-
-            const defaultMembers = [
-                { id: "1", name: 'Ahmed Rahman', phone: '+8801XXX', email: 'ahmed@example.com', joinDate: '2025-01-15' },
-                { id: "2", name: 'Fatima Khan', phone: '+8801XXX', email: 'fatima@example.com', joinDate: '2025-01-15' },
-                { id: "3", name: 'Mohammad Ali', phone: '+8801XXX', email: 'mohammad@example.com', joinDate: '2025-01-15' },
-                { id: "4", name: 'Ayesha Begum', phone: '+8801XXX', email: 'ayesha@example.com', joinDate: '2025-01-15' },
-                { id: "5", name: 'Ibrahim Hassan', phone: '+8801XXX', email: 'ibrahim@example.com', joinDate: '2025-01-15' }
-            ];
-
-            // Save default years
-            for (const [year, yearData] of Object.entries(defaultYears)) {
-                await db.collection('years').doc(year).set(yearData);
+        async function saveData() {
+            if (!isOnline) {
+                showSyncStatus('Offline - changes will sync when online', 'pending');
+                return;
             }
 
-            // Save default members
-            for (const member of defaultMembers) {
-                await db.collection('members').doc(member.id).set(member);
-            }
+            try {
+                showSyncStatus('Saving settings to cloud...', 'pending');
+                
+                // Save settings
+                await db.collection('settings').doc('appSettings').set(appData.settings, { merge: true });
 
-            // Initialize payments structure
-            for (const member of defaultMembers) {
-                const memberPayments = {};
-                for (const year of Object.keys(defaultYears)) {
-                    memberPayments[year] = Array(defaultYears[year].months.length).fill(null);
-                }
-                await db.collection('payments').doc(member.id).set(memberPayments);
+                showSyncStatus('Settings saved to cloud!', 'success');
+            } catch (error) {
+                console.error('Error saving data:', error);
+                showSyncStatus('Error saving to cloud', 'error');
             }
-
-            console.log('Default data initialized in Firebase');
         }
 
-        // ========== ENHANCED SAVE FUNCTIONS ==========
+        // Individual save functions for better performance
         async function saveMember(member) {
+            if (!isOnline) return;
             try {
-                await db.collection('members').doc(member.id).set(member, { merge: true });
-                return true;
+                // Ensure member.id is treated as a string for the Document ID
+                await db.collection('members').doc(member.id.toString()).set(member, { merge: true });
             } catch (error) {
                 console.error('Error saving member:', error);
-                return false;
             }
         }
 
-        async function savePayment(memberId, year, paymentArray) {
+        async function savePayment(memberId, year, payments) {
+            if (!isOnline) return;
             try {
-                await db.collection('payments').doc(memberId).set({
-                    [year]: paymentArray
+                // Sets the specific year array within the member's payments document
+                await db.collection('payments').doc(memberId.toString()).set({
+                    [year]: payments
                 }, { merge: true });
-                return true;
             } catch (error) {
                 console.error('Error saving payment:', error);
-                return false;
             }
         }
 
         async function saveDonation(donation) {
+            if (!isOnline) return;
             try {
-                const docRef = donation.id ? 
-                    db.collection('donations').doc(donation.id) :
-                    db.collection('donations').doc();
-                
-                await docRef.set(donation, { merge: true });
+                const docData = { ...donation };
+                delete docData.id; // Ensure we don't save the id field inside the document itself if it's new
+
+                // If donation.id exists, update the existing document, otherwise create a new one
+                const docRef = donation.id
+                    ? db.collection('donations').doc(donation.id)
+                    : db.collection('donations').doc();
+
+                await docRef.set(docData, { merge: true });
                 return docRef.id;
             } catch (error) {
                 console.error('Error saving donation:', error);
-                return null;
             }
         }
 
         async function saveExpense(expense) {
+            if (!isOnline) return;
             try {
-                const docRef = expense.id ? 
-                    db.collection('expenses').doc(expense.id) :
-                    db.collection('expenses').doc();
-                
-                await docRef.set(expense, { merge: true });
+                const docData = { ...expense };
+                delete docData.id; // Ensure we don't save the id field inside the document itself if it's new
+
+                // If expense.id exists, update the existing document, otherwise create a new one
+                const docRef = expense.id
+                    ? db.collection('expenses').doc(expense.id)
+                    : db.collection('expenses').doc();
+
+                await docRef.set(docData, { merge: true });
                 return docRef.id;
             } catch (error) {
                 console.error('Error saving expense:', error);
-                return null;
             }
         }
 
         async function saveYear(year, yearData) {
+            if (!isOnline) return;
             try {
-                await db.collection('years').doc(year).set(yearData, { merge: true });
-                return true;
+                const serializableData = {
+                    months: yearData.months,
+                    // Ensure monthDates are saved as ISO strings
+                    monthDates: yearData.monthDates.map(d => d instanceof Date ? d.toISOString() : d) 
+                };
+                await db.collection('years').doc(year).set(serializableData, { merge: true });
             } catch (error) {
                 console.error('Error saving year:', error);
-                return false;
             }
         }
 
@@ -1658,44 +1511,31 @@
                 details: details
             };
             
-            try {
-                await db.collection('activityLogs').add(logEntry);
-            } catch (error) {
-                console.error('Error saving activity log:', error);
+            // Add to in-memory array (unshift for newest first)
+            appData.activityLogs.unshift(logEntry);
+            
+            // Keep only last 1000 logs
+            if (appData.activityLogs.length > 1000) {
+                appData.activityLogs = appData.activityLogs.slice(0, 1000);
+            }
+            
+            // Save to Firebase
+            if (isOnline) {
+                try {
+                    // Use .add() for a new, timestamped log entry
+                    await db.collection('activityLogs').add(logEntry);
+                } catch (error) {
+                    console.error('Error saving activity log:', error);
+                }
+            }
+            
+            if (document.getElementById('logs').classList.contains('active')) {
+                renderActivityLogs();
             }
         }
 
-        // ========== NETWORK STATUS HANDLING ==========
-        function handleOnline() {
-            isOnline = true;
-            showSyncStatus('✅ Back online - syncing data...', 'online');
-        }
+        // ========== CUSTOM DIALOG MANAGEMENT (Functions remain unchanged) ==========
 
-        function handleOffline() {
-            isOnline = false;
-            showSyncStatus('⚠️ You are offline - changes will sync when online', 'offline');
-        }
-
-        function showSyncStatus(message, type) {
-            const statusElement = document.getElementById('syncStatus');
-            statusElement.textContent = message;
-            statusElement.className = `sync-status sync-${type} show`;
-            
-            setTimeout(() => {
-                statusElement.classList.remove('show');
-            }, 5000);
-        }
-
-        function showLoading(message) {
-            document.getElementById('loadingOverlay').style.display = 'flex';
-            document.getElementById('loadingText').textContent = message;
-        }
-
-        function hideLoading() {
-            document.getElementById('loadingOverlay').style.display = 'none';
-        }
-
-        // ========== CUSTOM DIALOG MANAGEMENT ==========
         function hideCustomDialogModal() {
             document.getElementById('customDialogModal').style.display = 'none';
         }
@@ -1741,7 +1581,42 @@
             modal.style.display = 'flex';
         }
 
-        // ========== AUTHENTICATION FUNCTIONS ==========
+        // ========== NETWORK STATUS HANDLING (Functions remain unchanged) ==========
+
+        function handleOnline() {
+            isOnline = true;
+            showSyncStatus('Back online - syncing data...', 'pending');
+            // Re-initialize to reload data which might have been changed while offline
+            initializeFirebase(); 
+        }
+
+        function handleOffline() {
+            isOnline = false;
+            showSyncStatus('You are offline - changes saved locally', 'error');
+        }
+
+        function showSyncStatus(message, type) {
+            const statusElement = document.getElementById('syncStatus');
+            statusElement.textContent = message;
+            statusElement.className = `sync-status sync-${type}`;
+            statusElement.style.display = 'block';
+            
+            setTimeout(() => {
+                statusElement.style.display = 'none';
+            }, 5000);
+        }
+
+        function showLoading(message) {
+            document.getElementById('loadingOverlay').style.display = 'flex';
+            document.getElementById('loadingText').textContent = message;
+        }
+
+        function hideLoading() {
+            document.getElementById('loadingOverlay').style.display = 'none';
+        }
+
+        // ========== AUTHENTICATION FUNCTIONS (Functions remain unchanged) ==========
+
         function showLoginModal() {
             document.getElementById('loginModal').style.display = 'flex';
         }
@@ -1821,12 +1696,15 @@
             return true;
         }
 
-        // ========== ADMIN CONTROLS MANAGEMENT ==========
+        // ========== ADMIN CONTROLS MANAGEMENT (Functions remain unchanged) ==========
+
         function updateAdminControls() {
             // Admin controls are now handled by CSS classes
+            // The admin-only class is hidden by default and shown when logged in
         }
 
-        // ========== TAB MANAGEMENT ==========
+        // ========== TAB MANAGEMENT (Functions remain unchanged) ==========
+
         function switchTab(tabName) {
             document.querySelectorAll('.tab').forEach(tab => {
                 tab.classList.remove('active');
@@ -1844,27 +1722,33 @@
             if (tabName === 'logs') renderActivityLogs();
         }
 
-        // ========== CORE APPLICATION FUNCTIONS ==========
+        // ========== CORE APPLICATION FUNCTIONS (Functions remain unchanged) ==========
+
         function initializePayments() {
-            members.forEach(member => {
-                if (!payments[member.id]) {
-                    payments[member.id] = {};
-                    Object.keys(years).forEach(year => {
-                        payments[member.id][year] = Array(years[year].months.length).fill(null);
-                    });
+            appData.members.forEach(member => {
+                if (!appData.payments[member.id]) {
+                    appData.payments[member.id] = {};
                 }
+                Object.keys(appData.years).forEach(year => {
+                    if (!appData.payments[member.id][year]) {
+                         // Initialize with null array for months if not present in Firestore
+                        appData.payments[member.id][year] = Array(appData.years[year].months.length).fill(null);
+                    }
+                });
             });
         }
 
-        // ========== YEAR MANAGEMENT ==========
+        // ========== YEAR MANAGEMENT (Date Object handling fix) ==========
+
         function renderYears() {
             const container = document.getElementById('yearsContainer');
             container.innerHTML = '';
             
-            Object.keys(years).sort().forEach(year => {
-                const yearData = years[year];
+            Object.keys(appData.years).sort().forEach(year => {
+                const yearData = appData.years[year];
                 const yearSection = document.createElement('div');
                 yearSection.className = 'year-section';
+
                 yearSection.innerHTML = `
                     <div class="year-header">
                         <div class="year-title">
@@ -1902,9 +1786,7 @@
             const headerRow = document.getElementById(`header-${year}`);
             const tableBody = document.getElementById(`body-${year}`);
             const totalRow = document.getElementById(`total-${year}`);
-            const yearData = years[year];
-
-            if (!headerRow) return;
+            const yearData = appData.years[year];
 
             headerRow.innerHTML = '<th>Member Name</th>';
             yearData.months.forEach((month, index) => {
@@ -1919,53 +1801,66 @@
             headerRow.innerHTML += '<th>Total</th>';
 
             tableBody.innerHTML = '';
-            members.forEach(member => {
+            appData.members.forEach(member => {
                 const row = document.createElement('tr');
                 row.innerHTML = `<td><strong>${member.name}</strong></td>`;
                 
                 yearData.months.forEach((month, mIdx) => {
-                    const payment = payments[member.id]?.[year]?.[mIdx];
+                    const payment = appData.payments[member.id]?.[year]?.[mIdx];
                     const cellClass = payment ? 'cell-green' : getCellClass(year, mIdx);
                     row.innerHTML += `
                         <td class="${cellClass}">
                             <input type="number" value="${payment || ''}" 
-                                   onchange="updatePayment('${member.id}', '${year}', ${mIdx}, this.value)"
-                                   placeholder="0" ${!appData.settings.isAuthenticated ? 'disabled' : ''}>
+                                            onchange="updatePayment(${member.id}, '${year}', ${mIdx}, this.value)"
+                                            placeholder="0" ${!appData.settings.isAuthenticated ? 'disabled' : ''}>
                         </td>`;
                 });
 
-                const total = (payments[member.id]?.[year] || []).reduce((sum, val) => sum + (parseFloat(val) || 0), 0);
+                const total = (appData.payments[member.id]?.[year] || []).reduce((sum, val) => sum + (parseFloat(val) || 0), 0);
                 row.innerHTML += `<td><strong><span class="taka-symbol">৳</span>${total.toFixed(2)}</strong></td>`;
                 tableBody.appendChild(row);
             });
 
             totalRow.innerHTML = '<td>Monthly Total</td>';
             yearData.months.forEach((month, mIdx) => {
-                const monthTotal = members.reduce((sum, member) => 
-                    sum + (parseFloat(payments[member.id]?.[year]?.[mIdx]) || 0), 0);
+                const monthTotal = appData.members.reduce((sum, member) => 
+                    sum + (parseFloat(appData.payments[member.id]?.[year]?.[mIdx]) || 0), 0);
                 totalRow.innerHTML += `<td><span class="taka-symbol">৳</span>${monthTotal.toFixed(2)}</td>`;
             });
 
-            const grandTotal = members.reduce((sum, member) => 
-                sum + (payments[member.id]?.[year] || []).reduce((s, v) => s + (parseFloat(v) || 0), 0), 0);
+            const grandTotal = appData.members.reduce((sum, member) => 
+                sum + (appData.payments[member.id]?.[year] || []).reduce((s, v) => s + (parseFloat(v) || 0), 0), 0);
             totalRow.innerHTML += `<td><span class="taka-symbol">৳</span>${grandTotal.toFixed(2)}</td>`;
         }
 
         function getCellClass(year, monthIndex) {
             const today = new Date();
-            let monthDate;
-            if (typeof years[year].monthDates[monthIndex] === 'string') {
-                monthDate = new Date(years[year].monthDates[monthIndex]);
-            } else {
-                monthDate = years[year].monthDates[monthIndex];
-            }
             
+            // Get the date ISO string and convert it back to a Date object
+            const monthDateString = appData.years[year]?.monthDates[monthIndex];
+            if (!monthDateString) return 'cell-white'; // Safety check for missing data
+            
+            const monthDate = new Date(monthDateString);
+
+            // Correctly calculate deadline as the 10th of the current payment month
             const deadline = new Date(monthDate.getFullYear(), monthDate.getMonth(), 10);
             
+            // Calculate the date for the start of the next month (to define the end of the current period)
+            const nextMonthStart = new Date(monthDate.getFullYear(), monthDate.getMonth() + 1, 1);
+            
+            // If the month hasn't started yet (e.g., today is Oct 15, and this cell is for Nov)
             if (today < monthDate) return 'cell-white';
+            
+            // If the current date is between the 1st and the 10th (inclusive)
             if (today >= monthDate && today <= deadline) return 'cell-yellow';
-            if (today > deadline) return 'cell-red';
-            return 'cell-white';
+            
+            // If the current date is after the 10th and before the next month starts (i.e., overdue)
+            if (today > deadline && today < nextMonthStart) return 'cell-red';
+            
+            // If the current date is past the end of the month period, treat it as overdue if not paid.
+            if (today >= nextMonthStart) return 'cell-red';
+
+            return 'cell-white'; // Should not be reached for active months
         }
 
         function showAddYearModal() {
@@ -1980,8 +1875,8 @@
         async function confirmAddYear() {
             const year = document.getElementById('newYear').value;
             
-            if (year && !years[year]) {
-                years[year] = {
+            if (year && !appData.years[year]) {
+                const newYearData = {
                     months: [],
                     monthDates: []
                 };
@@ -1989,18 +1884,24 @@
                 for (let month = 0; month < 12; month++) {
                     const date = new Date(year, month, 1);
                     const monthName = date.toLocaleDateString('en-US', { month: 'short', year: 'numeric' });
-                    years[year].months.push(monthName);
-                    years[year].monthDates.push(date.toISOString());
+                    newYearData.months.push(monthName);
+                    // Store as ISO string for Firebase compatibility
+                    newYearData.monthDates.push(date.toISOString());
                 }
                 
-                members.forEach(member => {
-                    if (!payments[member.id]) {
-                        payments[member.id] = {};
+                appData.years[year] = newYearData;
+
+                appData.members.forEach(member => {
+                    if (!appData.payments[member.id]) {
+                        appData.payments[member.id] = {};
                     }
-                    payments[member.id][year] = Array(12).fill(null);
+                    appData.payments[member.id][year] = Array(12).fill(null);
+                    // Save new payment record to Firebase for each member
+                    savePayment(member.id, year, appData.payments[member.id][year]);
                 });
                 
-                await saveYear(year, years[year]);
+                // Save the new year data to Firebase
+                await saveYear(year, appData.years[year]);
                 
                 renderYears();
                 
@@ -2019,10 +1920,10 @@
             const body = document.getElementById('manageYearsBody');
             body.innerHTML = '';
             
-            Object.keys(years).sort().forEach(year => {
-                const yearData = years[year];
-                const totalCollection = members.reduce((sum, member) => 
-                    sum + (payments[member.id]?.[year] || []).reduce((s, v) => s + (parseFloat(v) || 0), 0), 0);
+            Object.keys(appData.years).sort().forEach(year => {
+                const yearData = appData.years[year];
+                const totalCollection = appData.members.reduce((sum, member) => 
+                    sum + (appData.payments[member.id]?.[year] || []).reduce((s, v) => s + (parseFloat(v) || 0), 0), 0);
                 
                 const row = document.createElement('tr');
                 row.innerHTML = `
@@ -2046,13 +1947,13 @@
         function deleteYearConfirmation(year) {
             if (!requireAuth()) return;
             
-            if (Object.keys(years).length <= 1) {
+            if (Object.keys(appData.years).length <= 1) {
                 showCustomAlert('❌ Cannot delete the only remaining year!', 'Error', 'danger');
                 return;
             }
 
-            const yearCollection = members.reduce((sum, member) => 
-                sum + (payments[member.id]?.[year] || []).reduce((s, v) => s + (parseFloat(v) || 0), 0), 0);
+            const yearCollection = appData.members.reduce((sum, member) => 
+                sum + (appData.payments[member.id]?.[year] || []).reduce((s, v) => s + (parseFloat(v) || 0), 0), 0);
             
             const message = yearCollection > 0
                 ? `⚠️ Year ${year} has collected ৳${yearCollection.toFixed(2)}. Are you sure you want to delete it? This action cannot be undone!`
@@ -2060,15 +1961,18 @@
 
             showCustomConfirm(message, 'Confirm Deletion', 'danger', async (confirmed) => {
                 if (confirmed) {
-                    delete years[year];
+                    delete appData.years[year];
                     
-                    members.forEach(member => {
-                        if (payments[member.id]) {
-                            delete payments[member.id][year];
+                    appData.members.forEach(member => {
+                        if (appData.payments[member.id]) {
+                            delete appData.payments[member.id][year];
+                            // Save member payment document to remove the year's data
+                            savePayment(member.id, year, null); // Deleting the year data in payment doc
                         }
                     });
                     
-                    if (isOnline && firebaseInitialized) {
+                    // Delete the year document from Firebase
+                    if (isOnline) {
                         try {
                             await db.collection('years').doc(year).delete();
                         } catch (error) {
@@ -2091,20 +1995,23 @@
 
         function deleteMonthConfirmation(year, monthIndex) {
             if (!requireAuth()) return;
-            const monthName = years[year].months[monthIndex];
+            const monthName = appData.years[year].months[monthIndex];
             
             showCustomConfirm(`Are you sure you want to delete ${monthName}?`, 'Confirm Deletion', 'danger', async (confirmed) => {
                 if (confirmed) {
-                    years[year].months.splice(monthIndex, 1);
-                    years[year].monthDates.splice(monthIndex, 1);
+                    appData.years[year].months.splice(monthIndex, 1);
+                    appData.years[year].monthDates.splice(monthIndex, 1);
                     
-                    members.forEach(member => {
-                        if (payments[member.id]?.[year]) {
-                            payments[member.id][year].splice(monthIndex, 1);
+                    appData.members.forEach(member => {
+                        if (appData.payments[member.id]?.[year]) {
+                            appData.payments[member.id][year].splice(monthIndex, 1);
+                            // Save individual member payment
+                            savePayment(member.id, year, appData.payments[member.id][year]);
                         }
                     });
                     
-                    await saveYear(year, years[year]);
+                    // Update year data in Firebase
+                    await saveYear(year, appData.years[year]);
                     
                     renderYears();
                     
@@ -2128,21 +2035,24 @@
         }
 
         function updateDateRange() {
-            const yearsList = Object.keys(years).sort();
-            if (yearsList.length === 0) {
+            const years = Object.keys(appData.years).sort();
+            if (years.length === 0) {
                 document.getElementById('dateRange').textContent = "No years available";
                 return;
             }
             
-            const firstYear = yearsList[0];
-            const lastYear = yearsList[yearsList.length - 1];
-            const firstMonth = years[firstYear].months[0];
-            const lastMonth = years[lastYear].months[years[lastYear].months.length - 1];
+            const firstYear = years[0];
+            const lastYear = years[years.length - 1];
+            
+            // Check if months exist before accessing the array
+            const firstMonth = appData.years[firstYear].months[0] || firstYear;
+            const lastMonth = appData.years[lastYear].months[appData.years[lastYear].months.length - 1] || lastYear;
             
             document.getElementById('dateRange').textContent = `${firstMonth} - ${lastMonth}`;
         }
 
-        // ========== MEMBER MANAGEMENT ==========
+        // ========== MEMBER MANAGEMENT (ID handling fix) ==========
+
         function showAddMemberModal() {
             if (!requireAuth()) return;
             document.getElementById('addMemberModal').style.display = 'flex';
@@ -2161,24 +2071,28 @@
             const email = document.getElementById('newMemberEmail').value.trim();
             
             if (name) {
-                const newId = Math.max(...members.map(m => parseInt(m.id)), 0) + 1;
+                const newId = Math.max(...appData.members.map(m => m.id), 0) + 1;
                 const newMember = {
-                    id: newId.toString(),
+                    id: newId,
                     name: name,
                     phone: phone || 'Not provided',
                     email: email || 'Not provided',
                     joinDate: new Date().toISOString().split('T')[0]
                 };
                 
-                members.push(newMember);
+                appData.members.push(newMember);
                 
-                payments[newId] = {};
-                Object.keys(years).forEach(year => {
-                    payments[newId][year] = Array(years[year].months.length).fill(null);
+                appData.payments[newId] = {};
+                Object.keys(appData.years).forEach(year => {
+                    appData.payments[newId][year] = Array(appData.years[year].months.length).fill(null);
                 });
                 
+                // Save to Firebase
                 await saveMember(newMember);
-                await savePayment(newId, Object.keys(years)[0], payments[newId]);
+                // Also save the new empty payment record
+                Object.keys(appData.years).forEach(year => {
+                    savePayment(newId, year, appData.payments[newId][year]);
+                });
                 
                 renderYears();
                 
@@ -2197,9 +2111,9 @@
             const body = document.getElementById('manageMembersBody');
             body.innerHTML = '';
             
-            members.forEach(member => {
-                const totalPaid = Object.keys(years).reduce((sum, year) => 
-                    sum + (payments[member.id]?.[year] || []).reduce((s, v) => s + (parseFloat(v) || 0), 0), 0);
+            appData.members.forEach(member => {
+                const totalPaid = Object.keys(appData.years).reduce((sum, year) => 
+                    sum + (appData.payments[member.id]?.[year] || []).reduce((s, v) => s + (parseFloat(v) || 0), 0), 0);
                 
                 const row = document.createElement('tr');
                 row.innerHTML = `
@@ -2215,8 +2129,8 @@
                     <td>${member.joinDate}</td>
                     <td><span class="taka-symbol">৳</span>${totalPaid.toFixed(2)}</td>
                     <td>
-                        <button class="edit-btn" onclick="updateMember('${member.id}')">💾 Save</button>
-                        <button class="delete-btn" onclick="deleteMemberConfirmation('${member.id}')">🗑️ Delete</button>
+                        <button class="edit-btn" onclick="updateMember(${member.id})">💾 Save</button>
+                        <button class="delete-btn" onclick="deleteMemberConfirmation(${member.id})">🗑️ Delete</button>
                     </td>
                 `;
                 body.appendChild(row);
@@ -2235,13 +2149,14 @@
             const email = document.getElementById(`email-${memberId}`).value.trim();
             
             if (name) {
-                const member = members.find(m => m.id === memberId);
+                const member = appData.members.find(m => m.id === memberId);
                 if (member) {
                     const oldName = member.name;
                     member.name = name;
                     member.phone = phone;
                     member.email = email;
                     
+                    // Save to Firebase
                     await saveMember(member);
                     
                     renderYears();
@@ -2257,18 +2172,19 @@
 
         function deleteMemberConfirmation(memberId) {
             if (!requireAuth()) return;
-            const member = members.find(m => m.id === memberId);
+            const member = appData.members.find(m => m.id === memberId);
             if (!member) return;
             
             showCustomConfirm(`Are you sure you want to delete member ${member.name}? This will also delete all their payment records!`, 'Confirm Deletion', 'danger', async (confirmed) => {
                 if (confirmed) {
-                    members = members.filter(m => m.id !== memberId);
-                    delete payments[memberId];
+                    appData.members = appData.members.filter(m => m.id !== memberId);
+                    delete appData.payments[memberId];
                     
-                    if (isOnline && firebaseInitialized) {
+                    // Delete from Firebase
+                    if (isOnline) {
                         try {
-                            await db.collection('members').doc(memberId).delete();
-                            await db.collection('payments').doc(memberId).delete();
+                            await db.collection('members').doc(memberId.toString()).delete();
+                            await db.collection('payments').doc(memberId.toString()).delete();
                         } catch (error) {
                             console.error('Error deleting member from Firebase:', error);
                         }
@@ -2284,33 +2200,35 @@
             });
         }
 
-        // ========== PAYMENT MANAGEMENT ==========
+        // ========== PAYMENT MANAGEMENT (Functions remain unchanged) ==========
+
         async function updatePayment(memberId, year, monthIndex, value) {
             if (!appData.settings.isAuthenticated) {
                 showCustomAlert('🔐 Admin access required to modify payments!', 'Authorization Required', 'danger');
                 return;
             }
             
-            if (!payments[memberId]) {
-                payments[memberId] = {};
+            if (!appData.payments[memberId]) {
+                appData.payments[memberId] = {};
             }
-            if (!payments[memberId][year]) {
-                payments[memberId][year] = Array(years[year].months.length).fill(null);
+            if (!appData.payments[memberId][year]) {
+                appData.payments[memberId][year] = Array(appData.years[year].months.length).fill(null);
             }
             
-            const oldValue = payments[memberId][year][monthIndex];
-            payments[memberId][year][monthIndex] = value ? parseFloat(value) : null;
+            const oldValue = appData.payments[memberId][year][monthIndex];
+            appData.payments[memberId][year][monthIndex] = value ? parseFloat(value) : null;
             
-            const member = members.find(m => m.id === memberId);
-            const monthName = years[year].months[monthIndex];
+            const member = appData.members.find(m => m.id === memberId);
+            const monthName = appData.years[year].months[monthIndex];
             
-            await savePayment(memberId, year, payments[memberId][year]);
+            // Save to Firebase
+            await savePayment(memberId, year, appData.payments[memberId][year]);
             
             renderYearTable(year);
             updateDashboard();
             
-            if (oldValue !== payments[memberId][year][monthIndex]) {
-                const action = payments[memberId][year][monthIndex] ? 
+            if (oldValue !== appData.payments[memberId][year][monthIndex]) {
+                const action = appData.payments[memberId][year][monthIndex] ? 
                     `added payment for ${monthName}` : `removed payment for ${monthName}`;
                 
                 logActivity('updated payment', 
@@ -2318,7 +2236,8 @@
             }
         }
 
-        // ========== DONATION MANAGEMENT ==========
+        // ========== DONATION MANAGEMENT (ID assignment fix) ==========
+
         function showAddDonationModal() {
             if (!requireAuth()) return;
             document.getElementById('donationDate').value = new Date().toISOString().split('T')[0];
@@ -2344,10 +2263,12 @@
             }
 
             const donation = { date, name, amount, note: note || '' };
-            donations.push(donation);
             
-            const donationId = await saveDonation(donation);
-            if (donationId) donation.id = donationId;
+            // Save to Firebase, which returns the new Document ID
+            const newId = await saveDonation(donation);
+            donation.id = newId; // Assign the new Firebase document ID to the local object
+
+            appData.donations.push(donation);
             
             renderDonations();
             updateDashboard();
@@ -2364,36 +2285,40 @@
             const donationsBody = document.getElementById('donationsBody');
             donationsBody.innerHTML = '';
             
-            donations.forEach((donation, idx) => {
+            appData.donations.forEach((donation) => {
                 const row = document.createElement('tr');
+                // Use donation.id for delete confirmation
                 row.innerHTML = `
                     <td>${donation.date}</td>
                     <td>${donation.name}</td>
                     <td><span class="taka-symbol">৳</span>${donation.amount.toFixed(2)}</td>
                     <td>${donation.note}</td>
                     <td class="admin-only">
-                        <button class="delete-btn" onclick="deleteDonationConfirmation('${donation.id}', ${idx})">Delete</button>
+                        <button class="delete-btn" onclick="deleteDonationConfirmation('${donation.id}')">Delete</button>
                     </td>
                 `;
                 donationsBody.appendChild(row);
             });
 
-            const total = donations.reduce((sum, d) => sum + d.amount, 0);
+            const total = appData.donations.reduce((sum, d) => sum + d.amount, 0);
             document.getElementById('totalDonations').textContent = total.toFixed(2);
         }
 
-        function deleteDonationConfirmation(donationId, index) {
+        function deleteDonationConfirmation(donationId) {
             if (!requireAuth()) return;
-            const donation = donations[index];
+            
+            const indexToDelete = appData.donations.findIndex(d => d.id === donationId);
+            const donation = appData.donations[indexToDelete];
             if (!donation) return;
 
             showCustomConfirm(`Are you sure you want to delete the donation from ${donation.name} for ৳${donation.amount.toFixed(2)}?`, 'Confirm Deletion', 'danger', async (confirmed) => {
                 if (confirmed) {
-                    const deletedDonation = donations.splice(index, 1)[0];
+                    const deletedDonation = appData.donations.splice(indexToDelete, 1)[0];
                     
-                    if (donationId && isOnline && firebaseInitialized) {
+                    // Delete from Firebase using the document ID
+                    if (deletedDonation.id && isOnline) {
                         try {
-                            await db.collection('donations').doc(donationId).delete();
+                            await db.collection('donations').doc(deletedDonation.id).delete();
                         } catch (error) {
                             console.error('Error deleting donation from Firebase:', error);
                         }
@@ -2411,7 +2336,8 @@
             });
         }
 
-        // ========== EXPENSE MANAGEMENT ==========
+        // ========== EXPENSE MANAGEMENT (ID assignment fix) ==========
+
         function showAddExpenseModal() {
             if (!requireAuth()) return;
             document.getElementById('expenseDate').value = new Date().toISOString().split('T')[0];
@@ -2444,10 +2370,11 @@
                 addedOn: new Date().toISOString()
             };
             
-            expenses.push(expense);
-            
-            const expenseId = await saveExpense(expense);
-            if (expenseId) expense.id = expenseId;
+            // Save to Firebase, which returns the new Document ID
+            const newId = await saveExpense(expense);
+            expense.id = newId; // Assign the new Firebase document ID to the local object
+
+            appData.expenses.push(expense);
             
             renderExpenses();
             updateFinance();
@@ -2463,35 +2390,39 @@
             const expensesBody = document.getElementById('expensesBody');
             expensesBody.innerHTML = '';
             
-            expenses.sort((a, b) => new Date(b.date) - new Date(a.date));
+            appData.expenses.sort((a, b) => new Date(b.date) - new Date(a.date));
             
-            expenses.forEach((expense, idx) => {
+            appData.expenses.forEach((expense) => {
                 const row = document.createElement('tr');
+                // Use expense.id for delete confirmation
                 row.innerHTML = `
                     <td>${expense.date}</td>
                     <td><span class="taka-symbol">৳</span>${expense.amount.toFixed(2)}</td>
                     <td>${expense.category}</td>
                     <td>${expense.description}</td>
                     <td class="admin-only">
-                        <button class="delete-btn" onclick="deleteExpenseConfirmation('${expense.id}', ${idx})">Delete</button>
+                        <button class="delete-btn" onclick="deleteExpenseConfirmation('${expense.id}')">Delete</button>
                     </td>
                 `;
                 expensesBody.appendChild(row);
             });
         }
 
-        function deleteExpenseConfirmation(expenseId, index) {
+        function deleteExpenseConfirmation(expenseId) {
             if (!requireAuth()) return;
-            const expense = expenses[index];
+            
+            const indexToDelete = appData.expenses.findIndex(e => e.id === expenseId);
+            const expense = appData.expenses[indexToDelete];
             if (!expense) return;
 
             showCustomConfirm(`Are you sure you want to delete the expense of ৳${expense.amount.toFixed(2)} (${expense.category})?`, 'Confirm Deletion', 'danger', async (confirmed) => {
                 if (confirmed) {
-                    expenses.splice(index, 1);
+                    const deletedExpense = appData.expenses.splice(indexToDelete, 1)[0];
                     
-                    if (expenseId && isOnline && firebaseInitialized) {
+                    // Delete from Firebase using the document ID
+                    if (deletedExpense.id && isOnline) {
                         try {
-                            await db.collection('expenses').doc(expenseId).delete();
+                            await db.collection('expenses').doc(deletedExpense.id).delete();
                         } catch (error) {
                             console.error('Error deleting expense from Firebase:', error);
                         }
@@ -2508,7 +2439,8 @@
             });
         }
 
-        // ========== DASHBOARD FUNCTIONS ==========
+        // ========== DASHBOARD FUNCTIONS (Functions remain unchanged) ==========
+
         function updateDashboard() {
             const totalCollected = getTotalCollected();
             const totalDonations = getTotalDonations();
@@ -2518,29 +2450,22 @@
             let paidMembers = 0;
             let dueMembers = 0;
 
-            Object.keys(years).forEach(year => {
-                const yearData = years[year];
-                yearData.monthDates.forEach((monthDate, index) => {
-                    let monthDateObj;
-                    if (typeof monthDate === 'string') {
-                        monthDateObj = new Date(monthDate);
-                    } else {
-                        monthDateObj = monthDate;
-                    }
+            // Iterate over all years and all months to find the current month
+            Object.keys(appData.years).sort().forEach(year => {
+                const yearData = appData.years[year];
+                yearData.monthDates.forEach((monthDateString, index) => {
+                    const monthDate = new Date(monthDateString);
+                    // Determine the start of the next month
+                    const nextMonth = new Date(monthDate.getFullYear(), monthDate.getMonth() + 1, 1);
                     
-                    const nextMonth = yearData.monthDates[index + 1] ? 
-                        (typeof yearData.monthDates[index + 1] === 'string' ? 
-                            new Date(yearData.monthDates[index + 1]) : 
-                            yearData.monthDates[index + 1]) : 
-                        new Date(monthDateObj.getFullYear(), monthDateObj.getMonth() + 1, 1);
-                    
-                    if (today >= monthDateObj && today < nextMonth) {
-                        currentMonthCollection = members.reduce((sum, member) => 
-                            sum + (parseFloat(payments[member.id]?.[year]?.[index]) || 0), 0);
+                    if (today >= monthDate && today < nextMonth) {
+                        currentMonthCollection = appData.members.reduce((sum, member) => 
+                            sum + (parseFloat(appData.payments[member.id]?.[year]?.[index]) || 0), 0);
                         
-                        paidMembers = members.filter(member => 
-                            parseFloat(payments[member.id]?.[year]?.[index]) > 0).length;
-                        dueMembers = members.length - paidMembers;
+                        // Count paid and due members for the CURRENT month/year index
+                        paidMembers = appData.members.filter(member => 
+                            parseFloat(appData.payments[member.id]?.[year]?.[index]) > 0).length;
+                        dueMembers = appData.members.length - paidMembers;
                     }
                 });
             });
@@ -2557,19 +2482,19 @@
             const allMonths = [];
             const monthlyData = [];
             
-            Object.keys(years).sort().forEach(year => {
-                years[year].months.forEach((month, index) => {
+            Object.keys(appData.years).sort().forEach(year => {
+                appData.years[year].months.forEach((month, index) => {
                     allMonths.push(month);
-                    const monthTotal = members.reduce((sum, member) => 
-                        sum + (parseFloat(payments[member.id]?.[year]?.[index]) || 0), 0);
+                    const monthTotal = appData.members.reduce((sum, member) => 
+                        sum + (parseFloat(appData.payments[member.id]?.[year]?.[index]) || 0), 0);
                     monthlyData.push(monthTotal);
                 });
             });
 
-            const contributorData = members.map(member => ({
+            const contributorData = appData.members.map(member => ({
                 name: member.name,
-                total: Object.keys(years).reduce((sum, year) => 
-                    sum + (payments[member.id]?.[year] || []).reduce((s, v) => s + (parseFloat(v) || 0), 0), 0)
+                total: Object.keys(appData.years).reduce((sum, year) => 
+                    sum + (appData.payments[member.id]?.[year] || []).reduce((s, v) => s + (parseFloat(v) || 0), 0), 0)
             })).sort((a, b) => b.total - a.total).slice(0, 10);
 
             if (monthlyChart) monthlyChart.destroy();
@@ -2633,7 +2558,8 @@
             });
         }
 
-        // ========== FINANCE FUNCTIONS ==========
+        // ========== FINANCE FUNCTIONS (Functions remain unchanged) ==========
+
         function updateFinance() {
             const totalIncome = getTotalCollected() + getTotalDonations();
             const totalExpenditure = getTotalExpenditure();
@@ -2650,22 +2576,22 @@
             const incomeByMonth = {};
             const expenseByMonth = {};
             
-            Object.keys(years).sort().forEach(year => {
-                years[year].months.forEach(month => {
+            Object.keys(appData.years).sort().forEach(year => {
+                appData.years[year].months.forEach(month => {
                     incomeByMonth[month] = 0;
                     expenseByMonth[month] = 0;
                 });
             });
             
-            Object.keys(years).sort().forEach(year => {
-                years[year].months.forEach((month, index) => {
-                    const monthIncome = members.reduce((sum, member) => 
-                        sum + (parseFloat(payments[member.id]?.[year]?.[index]) || 0), 0);
+            Object.keys(appData.years).sort().forEach(year => {
+                appData.years[year].months.forEach((month, index) => {
+                    const monthIncome = appData.members.reduce((sum, member) => 
+                        sum + (parseFloat(appData.payments[member.id]?.[year]?.[index]) || 0), 0);
                     incomeByMonth[month] += monthIncome;
                 });
             });
             
-            expenses.forEach(expense => {
+            appData.expenses.forEach(expense => {
                 const expenseDate = new Date(expense.date);
                 const expenseMonth = expenseDate.toLocaleDateString('en-US', { month: 'short', year: 'numeric' });
                 
@@ -2716,36 +2642,27 @@
         }
 
         function getTotalExpenditure() {
-            return expenses.reduce((sum, expense) => sum + expense.amount, 0);
+            return appData.expenses.reduce((sum, expense) => sum + expense.amount, 0);
         }
 
-        // ========== REPORTS FUNCTIONS ==========
+        // ========== REPORTS FUNCTIONS (Functions remain unchanged) ==========
+
         function updateReports() {
             const today = new Date();
             let currentPaidMembers = [];
             let currentDueMembers = [];
 
-            Object.keys(years).forEach(year => {
-                const yearData = years[year];
-                yearData.monthDates.forEach((monthDate, index) => {
-                    let monthDateObj;
-                    if (typeof monthDate === 'string') {
-                        monthDateObj = new Date(monthDate);
-                    } else {
-                        monthDateObj = monthDate;
-                    }
-                    
-                    const nextMonth = yearData.monthDates[index + 1] ? 
-                        (typeof yearData.monthDates[index + 1] === 'string' ? 
-                            new Date(yearData.monthDates[index + 1]) : 
-                            yearData.monthDates[index + 1]) : 
-                        new Date(monthDateObj.getFullYear(), monthDateObj.getMonth() + 1, 1);
-                    
-                    if (today >= monthDateObj && today < nextMonth) {
-                        currentPaidMembers = members.filter(member => 
-                            parseFloat(payments[member.id]?.[year]?.[index]) > 0);
-                        currentDueMembers = members.filter(member => 
-                            !parseFloat(payments[member.id]?.[year]?.[index]) > 0);
+            Object.keys(appData.years).sort().forEach(year => {
+                const yearData = appData.years[year];
+                yearData.monthDates.forEach((monthDateString, index) => {
+                    const monthDate = new Date(monthDateString);
+                    const nextMonth = new Date(monthDate.getFullYear(), monthDate.getMonth() + 1, 1);
+
+                    if (today >= monthDate && today < nextMonth) {
+                        currentPaidMembers = appData.members.filter(member => 
+                            parseFloat(appData.payments[member.id]?.[year]?.[index]) > 0);
+                        currentDueMembers = appData.members.filter(member => 
+                            !parseFloat(appData.payments[member.id]?.[year]?.[index]) > 0);
                     }
                 });
             });
@@ -2776,15 +2693,15 @@
             const contributionSummary = document.getElementById('contributionSummary');
             contributionSummary.innerHTML = '';
             
-            members.forEach(member => {
-                const total = Object.keys(years).reduce((sum, year) => 
-                    sum + (payments[member.id]?.[year] || []).reduce((s, v) => s + (parseFloat(v) || 0), 0), 0);
+            appData.members.forEach(member => {
+                const total = Object.keys(appData.years).reduce((sum, year) => 
+                    sum + (appData.payments[member.id]?.[year] || []).reduce((s, v) => s + (parseFloat(v) || 0), 0), 0);
                 
                 let monthsPaid = 0;
                 let totalMonths = 0;
                 
-                Object.keys(years).forEach(year => {
-                    const yearPayments = payments[member.id]?.[year] || [];
+                Object.keys(appData.years).forEach(year => {
+                    const yearPayments = appData.payments[member.id]?.[year] || [];
                     monthsPaid += yearPayments.filter(val => val !== null && parseFloat(val) > 0).length;
                     totalMonths += yearPayments.length;
                 });
@@ -2798,7 +2715,7 @@
                     <td>${monthsPaid}</td>
                     <td>${monthsDue}</td>
                     <td class="admin-only">
-                        <button class="delete-btn" onclick="deleteMemberConfirmation('${member.id}')">Delete</button>
+                        <button class="delete-btn" onclick="deleteMemberConfirmation(${member.id})">Delete</button>
                     </td>
                 `;
                 contributionSummary.appendChild(row);
@@ -2814,17 +2731,18 @@
             }
         }
 
-        // ========== ACTIVITY LOGS ==========
+        // ========== ACTIVITY LOGS (Functions remain unchanged) ==========
+
         function renderActivityLogs() {
             const logsContainer = document.getElementById('activityLogs');
             logsContainer.innerHTML = '';
             
-            if (activityLogs.length === 0) {
+            if (appData.activityLogs.length === 0) {
                 logsContainer.innerHTML = '<div class="log-entry">No activity logs yet.</div>';
                 return;
             }
             
-            activityLogs.forEach(log => {
+            appData.activityLogs.forEach(log => {
                 const logEntry = document.createElement('div');
                 logEntry.className = 'log-entry';
                 
@@ -2843,13 +2761,14 @@
             });
         }
 
-        // ========== EXPORT FUNCTIONALITY ==========
+        // ========== EXPORT FUNCTIONALITY (Functions remain unchanged) ==========
+
         function showExportModal() {
             document.getElementById('exportModal').style.display = 'flex';
             
             const yearSelect = document.getElementById('exportYearSelect');
             yearSelect.innerHTML = '';
-            Object.keys(years).sort().forEach(year => {
+            Object.keys(appData.years).sort().forEach(year => {
                 yearSelect.innerHTML += `<option value="${year}">${year}</option>`;
             });
             
@@ -2878,6 +2797,7 @@
             }
             
             hideExportModal();
+            // Don't log activity for public exports
             if (appData.settings.isAuthenticated) {
                 logActivity('exported data', `Exported ${dataType} data as ${format.toUpperCase()}`);
             }
@@ -2887,6 +2807,9 @@
             try {
                 const wb = XLSX.utils.book_new();
                 let fileName = `Rangdhanu_Charity_Report_${new Date().toISOString().split('T')[0]}`;
+                const members = appData.members;
+                const payments = appData.payments;
+                const years = appData.years;
 
                 const addSummarySheet = () => {
                     const summaryData = [
@@ -2910,7 +2833,7 @@
                     addSummarySheet();
 
                     const expenseData = [['Date', 'Amount (৳)', 'Category', 'Description', 'Added By', 'Added On']];
-                    expenses.forEach(expense => {
+                    appData.expenses.forEach(expense => {
                         expenseData.push([
                             expense.date, 
                             expense.amount, 
@@ -2964,7 +2887,7 @@
 
                 if (dataType === 'donations' || dataType === 'all') {
                     const donationData = [['Date', 'Donor Name', 'Amount (৳)', 'Note']];
-                    donations.forEach(donation => {
+                    appData.donations.forEach(donation => {
                         donationData.push([donation.date, donation.name, donation.amount.toFixed(2), donation.note]);
                     });
                     
@@ -2979,7 +2902,7 @@
 
                 if (dataType === 'expenses') {
                     const expenseData = [['Date', 'Amount (৳)', 'Category', 'Description', 'Added By', 'Added On']];
-                    expenses.forEach(expense => {
+                    appData.expenses.forEach(expense => {
                         expenseData.push([
                             expense.date, 
                             expense.amount.toFixed(2), 
@@ -2997,7 +2920,7 @@
                 
                 if (dataType === 'logs' || dataType === 'all') {
                     const logData = [['Timestamp', 'Admin', 'Action', 'Details']];
-                    activityLogs.forEach(log => {
+                    appData.activityLogs.forEach(log => {
                         logData.push([
                             new Date(log.timestamp).toLocaleString(),
                             log.admin,
@@ -3035,7 +2958,7 @@
                 
                 let yPosition = 35;
                 const margin = 14;
-                const primaryColor = [102, 126, 234];
+                const primaryColor = [102, 126, 234]; // #667eea
 
                 const addSectionTitle = (titleText) => {
                     if (yPosition > 270) {
@@ -3056,7 +2979,7 @@
                     addSectionTitle('I. Overall Financial Summary');
 
                     const summaryData = [
-                        ['Total Members', members.length.toString()],
+                        ['Total Members', appData.members.length.toString()],
                         ['Total Member Collections', `৳${getTotalCollected().toFixed(2)}`],
                         ['Total Public Donations', `৳${getTotalDonations().toFixed(2)}`],
                         ['Total Collection (Collection + Donations)', `৳${totalIncome.toFixed(2)}`],
@@ -3085,14 +3008,14 @@
                     const memberRows = [];
                     const allMemberHeaders = ['Member', 'Total ৳', 'Paid Months', 'Due Months'];
                     
-                    members.forEach(member => {
+                    appData.members.forEach(member => {
                         let total = 0;
                         let paidMonths = 0;
                         let totalMonths = 0;
                         
-                        Object.keys(years).sort().forEach(year => {
+                        Object.keys(appData.years).sort().forEach(year => {
                             if (dataType === 'members' && selectedYear && year !== selectedYear) return;
-                            const yearPayments = payments[member.id]?.[year] || [];
+                            const yearPayments = appData.payments[member.id]?.[year] || [];
                             paidMonths += yearPayments.filter(val => val !== null && parseFloat(val) > 0).length;
                             totalMonths += yearPayments.length;
                             total += yearPayments.reduce((sum, val) => sum + (parseFloat(val) || 0), 0);
@@ -3123,7 +3046,7 @@
                     addSectionTitle('III. Public Donations Records');
                     
                     const donationHeaders = ['Date', 'Donor Name', 'Amount (৳)', 'Note'];
-                    const donationRows = donations.map(d => [
+                    const donationRows = appData.donations.map(d => [
                         d.date, 
                         d.name, 
                         `৳${d.amount.toFixed(2)}`, 
@@ -3152,7 +3075,7 @@
                     addSectionTitle('IV. Detailed Expenditure Records');
 
                     const expenseHeaders = ['Date', 'Amount (৳)', 'Category', 'Description'];
-                    const expenseRows = expenses.map(e => [
+                    const expenseRows = appData.expenses.map(e => [
                         e.date, 
                         `৳${e.amount.toFixed(2)}`, 
                         e.category, 
@@ -3181,7 +3104,7 @@
                     addSectionTitle('V. Admin Activity Logs');
                     
                     const logHeaders = ['Timestamp', 'Admin', 'Action', 'Details'];
-                    const logRows = activityLogs.map(log => [
+                    const logRows = appData.activityLogs.map(log => [
                         new Date(log.timestamp).toLocaleString(),
                         log.admin,
                         log.action,
@@ -3211,7 +3134,8 @@
             }
         }
 
-        // ========== SYSTEM MANAGEMENT ==========
+        // ========== SYSTEM MANAGEMENT (Includes Transactional Restore Fix) ==========
+
         function showManageModal() {
             if (!requireAuth()) return;
             document.getElementById('manageModal').style.display = 'flex';
@@ -3244,17 +3168,20 @@
             try {
                 showLoading('Creating backup...');
                 
+                // Prepare serializable data for backup
+                const serializableAppData = {
+                    years: appData.years,
+                    members: appData.members,
+                    payments: appData.payments,
+                    donations: appData.donations,
+                    expenses: appData.expenses,
+                    settings: appData.settings
+                };
+
                 const backupData = {
                     timestamp: new Date().toISOString(),
                     createdBy: appData.settings.currentAdmin,
-                    data: {
-                        years: years,
-                        members: members,
-                        payments: payments,
-                        donations: donations,
-                        expenses: expenses,
-                        settings: appData.settings
-                    }
+                    data: serializableAppData
                 };
                 
                 await db.collection('backups').add(backupData);
@@ -3316,19 +3243,72 @@
                         
                         const backupData = backupDoc.data().data;
                         
-                        years = backupData.years;
-                        members = backupData.members;
-                        payments = backupData.payments;
-                        donations = backupData.donations;
-                        expenses = backupData.expenses;
+                        // Restore data locally
+                        appData.years = backupData.years;
+                        appData.members = backupData.members;
+                        appData.payments = backupData.payments;
+                        appData.donations = backupData.donations;
+                        appData.expenses = backupData.expenses;
                         appData.settings = { ...appData.settings, ...backupData.settings };
                         
+                        // Overwrite main collections with restored data using batch writes
+                        const batch = db.batch();
+
+                        // Helper function to delete all documents in a collection (necessary for a full restore)
+                        const deleteCollection = async (collectionPath, batch) => {
+                            const snapshot = await db.collection(collectionPath).get();
+                            snapshot.docs.forEach(doc => batch.delete(doc.ref));
+                        };
+
+                        // 1. Members
+                        await deleteCollection('members', batch);
+                        backupData.members.forEach(member => {
+                            batch.set(db.collection('members').doc(member.id.toString()), member);
+                        });
+
+                        // 2. Payments
+                        await deleteCollection('payments', batch);
+                        Object.keys(backupData.payments).forEach(memberId => {
+                             // Note: Setting the entire object for the memberId document
+                            batch.set(db.collection('payments').doc(memberId), backupData.payments[memberId]);
+                        });
+
+                        // 3. Years
+                        await deleteCollection('years', batch);
+                        Object.keys(backupData.years).forEach(year => {
+                            batch.set(db.collection('years').doc(year), backupData.years[year]);
+                        });
+
+                        // 4. Donations
+                        await deleteCollection('donations', batch);
+                        backupData.donations.forEach(donation => {
+                            // Ensure donation has an ID for setting, or use a new one
+                            const docRef = donation.id ? db.collection('donations').doc(donation.id) : db.collection('donations').doc();
+                            batch.set(docRef, donation);
+                        });
+
+                        // 5. Expenses
+                        await deleteCollection('expenses', batch);
+                        backupData.expenses.forEach(expense => {
+                            const docRef = expense.id ? db.collection('expenses').doc(expense.id) : db.collection('expenses').doc();
+                            batch.set(docRef, expense);
+                        });
+
+                        // 6. Settings (Merge to keep admin passwords safe if not in backup)
+                        batch.set(db.collection('settings').doc('appSettings'), backupData.settings, { merge: true });
+                        
+                        // Commit the entire batch
+                        await batch.commit();
+
+                        // Re-render everything
+                        initializePayments(); // Must be called before renderYears/etc.
                         renderYears();
                         renderDonations();
                         renderExpenses();
                         updateDashboard();
                         updateReports();
                         updateFinance();
+                        renderActivityLogs();
                         
                         hideRestoreModal();
                         hideLoading();
@@ -3342,29 +3322,39 @@
             });
         }
 
-        // ========== UTILITY FUNCTIONS ==========
+        // ========== UTILITY FUNCTIONS (Functions remain unchanged) ==========
+
         function getTotalCollected() {
             let total = 0;
-            members.forEach(member => {
-                Object.keys(years).forEach(year => {
-                    total += (payments[member.id]?.[year] || []).reduce((sum, val) => sum + (parseFloat(val) || 0), 0);
+            appData.members.forEach(member => {
+                Object.keys(appData.years).forEach(year => {
+                    total += (appData.payments[member.id]?.[year] || []).reduce((sum, val) => sum + (parseFloat(val) || 0), 0);
                 });
             });
             return total;
         }
 
         function getTotalDonations() {
-            return donations.reduce((sum, d) => sum + d.amount, 0);
+            return appData.donations.reduce((sum, d) => sum + d.amount, 0);
         }
 
-        // ========== INITIALIZATION ==========
-        window.addEventListener('online', handleOnline);
-        window.addEventListener('offline', handleOffline);
+        // ========== INITIALIZATION (Calls Fixed initializeFirebase) ==========
 
-        document.addEventListener('DOMContentLoaded', function() {
-            initializeAppData();
-        });
+        async function initializeApp() {
+            // Set up network listeners
+            window.addEventListener('online', handleOnline);
+            window.addEventListener('offline', handleOffline);
+            
+            // Initialize Firebase and trigger all rendering AFTER data is loaded
+            await initializeFirebase();
+        }
 
+        // Initialize the application
+        initializeApp();
+
+        // Auto-save settings every 30 seconds
+        setInterval(saveData, 30000);
     </script>
 </body>
 </html>
+`
