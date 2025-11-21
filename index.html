@@ -1284,16 +1284,16 @@
     
     <script>
         // Firebase Configuration
-        const firebaseConfig = {
-            apiKey: "AIzaSyDChxV-zUTEMK_Oe1xJVn123c8l7fonhDk",
-            authDomain: "rangdhanu-1bdec.firebaseapp.com",
-            projectId: "rangdhanu-1bdec",
-            storageBucket: "rangdhanu-1bdec.firebasestorage.app",
-            messagingSenderId: "842682768144",
-            appId: "1:842682768144:web:ba7cdfbab05e0b7bd52395",
-            measurementId: "G-P3YGK1TF48"
-        };
-
+		// For Firebase JS SDK v7.20.0 and later, measurementId is optional
+		const firebaseConfig = {
+		  apiKey: "AIzaSyDChxV-zUTEMK_Oe1xJVn123c8l7fonhDk",
+		  authDomain: "rangdhanu-1bdec.firebaseapp.com",
+		  projectId: "rangdhanu-1bdec",
+		  storageBucket: "rangdhanu-1bdec.firebasestorage.app",
+		  messagingSenderId: "842682768144",
+		  appId: "1:842682768144:web:ba7cdfbab05e0b7bd52395",
+		  measurementId: "G-P3YGK1TF48"
+		};
         // Initialize Firebase
         firebase.initializeApp(firebaseConfig);
         const db = firebase.firestore();
@@ -1361,262 +1361,89 @@
 
         // ========== ENHANCED FIREBASE DATA MANAGEMENT ==========
 
-        async function initializeFirebase() {
-            showLoading('Connecting to database...');
-            try {
-                console.log('Initializing Firebase...');
-                
-                // Enhanced Firebase configuration with better error handling
-                const firebaseConfig = {
-                    apiKey: "AIzaSyDChxV-zUTEMK_Oe1xJVn123c8l7fonhDk",
-                    authDomain: "rangdhanu-1bdec.firebaseapp.com",
-                    projectId: "rangdhanu-1bdec",
-                    storageBucket: "rangdhanu-1bdec.firebasestorage.app",
-                    messagingSenderId: "842682768144",
-                    appId: "1:842682768144:web:ba7cdfbab05e0b7bd52395",
-                    measurementId: "G-P3YGK1TF48"
-                };
 
-                // Initialize Firebase if not already initialized
-                if (!firebase.apps.length) {
-                    firebase.initializeApp(firebaseConfig);
-                }
-                
-                // Enable offline persistence
-                await firebase.firestore().enablePersistence()
-                    .catch((err) => {
-                        console.warn('Offline persistence not supported:', err);
-                    });
+		async function loadAllData() {
+			if (!firebaseInitialized) {
+				console.log('Firebase not initialized, skipping load');
+				return;
+			}
 
-                firebaseInitialized = true;
-                
-                // Test connection
-                await firebase.firestore().collection('settings').doc('appSettings').get();
-                
-                // Load all data
-                await loadAllData();
-                
-                hideLoading();
-                showSyncStatus('Connected to cloud database!', 'success');
-                console.log('Firebase initialized successfully');
-                
-            } catch (error) {
-                console.error('Firebase initialization error:', error);
-                firebaseInitialized = false;
-                await initializeWithDefaultData();
-                hideLoading();
-                showSyncStatus('Using offline mode - ' + error.message, 'error');
-            }
-        }
+			try {
+				console.log('Loading data from Firebase...');
+				
+				// Load settings
+				const settingsDoc = await db.collection('settings').doc('appSettings').get();
+				if (settingsDoc.exists) {
+					const settingsData = settingsDoc.data();
+					appData.settings = { ...appData.settings, ...settingsData };
+				}
 
-        async function loadAllData() {
-            if (!firebaseInitialized) {
-                console.log('Firebase not initialized, using default data');
-                await initializeWithDefaultData();
-                return;
-            }
+				// Load years
+				const yearsSnapshot = await db.collection('years').get();
+				if (!yearsSnapshot.empty) {
+					appData.years = {};
+					yearsSnapshot.forEach(doc => {
+						appData.years[doc.id] = doc.data();
+					});
+				}
+				
+				// Load members
+				const membersSnapshot = await db.collection('members').get();
+				if (!membersSnapshot.empty) {
+					appData.members = [];
+					membersSnapshot.forEach(doc => {
+						appData.members.push({ id: parseInt(doc.id), ...doc.data() });
+					});
+					appData.members.sort((a, b) => a.id - b.id);
+				}
+				
+				// Initialize payments
+				initializePayments();
+				
+				// Load payments
+				const paymentsSnapshot = await db.collection('payments').get();
+				if (!paymentsSnapshot.empty) {
+					paymentsSnapshot.forEach(doc => {
+						appData.payments[doc.id] = doc.data();
+					});
+				}
+				
+				// Load donations
+				const donationsSnapshot = await db.collection('donations').get();
+				if (!donationsSnapshot.empty) {
+					appData.donations = [];
+					donationsSnapshot.forEach(doc => {
+						appData.donations.push({ id: doc.id, ...doc.data() });
+					});
+				}
+				
+				// Load expenses
+				const expensesSnapshot = await db.collection('expenses').get();
+				if (!expensesSnapshot.empty) {
+					appData.expenses = [];
+					expensesSnapshot.forEach(doc => {
+						appData.expenses.push({ id: doc.id, ...doc.data() });
+					});
+				}
+				
+				// Load activity logs
+				const logsSnapshot = await db.collection('activityLogs')
+					.orderBy('timestamp', 'desc')
+					.limit(100)
+					.get();
+				if (!logsSnapshot.empty) {
+					appData.activityLogs = [];
+					logsSnapshot.forEach(doc => {
+						appData.activityLogs.push(doc.data());
+					});
+				}
 
-            try {
-                console.log('Loading data from Firebase...');
-                
-                // Load settings first with timeout
-                const settingsPromise = db.collection('settings').doc('appSettings').get();
-                const settingsTimeout = new Promise((_, reject) => 
-                    setTimeout(() => reject(new Error('Settings load timeout')), 10000)
-                );
-                
-                const settingsDoc = await Promise.race([settingsPromise, settingsTimeout]);
-                
-                if (settingsDoc.exists) {
-                    const settingsData = settingsDoc.data();
-                    appData.settings = { ...appData.settings, ...settingsData };
-                } else {
-                    await db.collection('settings').doc('appSettings').set(appData.settings);
-                }
-
-                // Load years with better error handling
-                await loadYearsData();
-                
-                // Load members
-                await loadMembersData();
-                
-                // Initialize payments structure
-                initializePayments();
-                
-                // Load payments
-                await loadPaymentsData();
-                
-                // Load donations
-                await loadDonationsData();
-                
-                // Load expenses
-                await loadExpensesData();
-                
-                // Load activity logs
-                await loadActivityLogs();
-
-                console.log('All data loaded successfully');
-                
-            } catch (error) {
-                console.error('Error loading data from Firebase:', error);
-                throw error;
-            }
-        }
-
-        async function loadYearsData() {
-            try {
-                const yearsSnapshot = await db.collection('years').get();
-                if (!yearsSnapshot.empty) {
-                    appData.years = {};
-                    yearsSnapshot.forEach(doc => {
-                        const yearData = doc.data();
-                        // Proper timestamp conversion
-                        if (yearData.monthDates && yearData.monthDates.length > 0) {
-                            yearData.monthDates = yearData.monthDates.map(date => {
-                                if (date && typeof date === 'object' && date.toDate) {
-                                    return date.toDate().toISOString();
-                                }
-                                return date;
-                            });
-                        }
-                        appData.years[doc.id] = yearData;
-                    });
-                } else {
-                    console.log('No years found in Firebase, initializing default years');
-                    for (const [year, yearData] of Object.entries(appData.years)) {
-                        await saveYear(year, yearData);
-                    }
-                }
-            } catch (error) {
-                console.error('Error loading years:', error);
-                throw error;
-            }
-        }
-
-        async function loadMembersData() {
-            try {
-                const membersSnapshot = await db.collection('members').get();
-                if (!membersSnapshot.empty) {
-                    appData.members = [];
-                    membersSnapshot.forEach(doc => {
-                        const memberData = doc.data();
-                        // Ensure proper ID handling
-                        appData.members.push({ 
-                            id: parseInt(doc.id) || memberData.id, 
-                            ...memberData 
-                        });
-                    });
-                    appData.members.sort((a, b) => a.id - b.id);
-                } else {
-                    console.log('No members found in Firebase, initializing default members');
-                    for (const member of appData.members) {
-                        await saveMember(member);
-                    }
-                }
-            } catch (error) {
-                console.error('Error loading members:', error);
-                throw error;
-            }
-        }
-
-        async function loadPaymentsData() {
-            try {
-                const paymentsSnapshot = await db.collection('payments').get();
-                appData.payments = {};
-                if (!paymentsSnapshot.empty) {
-                    paymentsSnapshot.forEach(doc => {
-                        const paymentData = doc.data();
-                        const memberId = doc.id;
-                        
-                        // Convert all timestamps in payment data
-                        Object.keys(paymentData).forEach(year => {
-                            if (paymentData[year] && Array.isArray(paymentData[year])) {
-                                paymentData[year] = paymentData[year].map(payment => {
-                                    if (payment && typeof payment === 'object' && payment.toDate) {
-                                        return payment.toDate().toISOString();
-                                    }
-                                    return payment;
-                                });
-                            }
-                        });
-                        appData.payments[memberId] = paymentData;
-                    });
-                }
-            } catch (error) {
-                console.error('Error loading payments:', error);
-                // Don't throw error for payments as we can initialize them
-            }
-        }
-
-        async function loadDonationsData() {
-            try {
-                const donationsSnapshot = await db.collection('donations').get();
-                appData.donations = [];
-                if (!donationsSnapshot.empty) {
-                    donationsSnapshot.forEach(doc => {
-                        const donationData = doc.data();
-                        // Convert date properly
-                        if (donationData.date) {
-                            if (donationData.date.toDate) {
-                                donationData.date = donationData.date.toDate().toISOString().split('T')[0];
-                            }
-                        }
-                        appData.donations.push({ id: doc.id, ...donationData });
-                    });
-                    appData.donations.sort((a, b) => new Date(b.date) - new Date(a.date));
-                }
-            } catch (error) {
-                console.error('Error loading donations:', error);
-                throw error;
-            }
-        }
-
-        async function loadExpensesData() {
-            try {
-                const expensesSnapshot = await db.collection('expenses').get();
-                appData.expenses = [];
-                if (!expensesSnapshot.empty) {
-                    expensesSnapshot.forEach(doc => {
-                        const expenseData = doc.data();
-                        // Convert dates properly
-                        if (expenseData.date && expenseData.date.toDate) {
-                            expenseData.date = expenseData.date.toDate().toISOString().split('T')[0];
-                        }
-                        if (expenseData.addedOn && expenseData.addedOn.toDate) {
-                            expenseData.addedOn = expenseData.addedOn.toDate().toISOString();
-                        }
-                        appData.expenses.push({ id: doc.id, ...expenseData });
-                    });
-                    appData.expenses.sort((a, b) => new Date(b.date) - new Date(a.date));
-                }
-            } catch (error) {
-                console.error('Error loading expenses:', error);
-                throw error;
-            }
-        }
-
-        async function loadActivityLogs() {
-            try {
-                const logsSnapshot = await db.collection('activityLogs')
-                    .orderBy('timestamp', 'desc')
-                    .limit(1000)
-                    .get();
-                appData.activityLogs = [];
-                if (!logsSnapshot.empty) {
-                    logsSnapshot.forEach(doc => {
-                        const logData = doc.data();
-                        if (logData.timestamp && logData.timestamp.toDate) {
-                            logData.timestamp = logData.timestamp.toDate().toISOString();
-                        }
-                        appData.activityLogs.push(logData);
-                    });
-                }
-            } catch (error) {
-                console.error('Error loading activity logs:', error);
-                // Don't throw error for logs as they're not critical
-            }
-        }
-
+				console.log('Data loaded successfully');
+				
+			} catch (error) {
+				console.error('Error loading data:', error);
+			}
+		}
         async function initializeWithDefaultData() {
             console.log('Initializing with default data...');
             
@@ -1817,19 +1644,11 @@
 
         // ========== NETWORK STATUS HANDLING ==========
 
-        function handleOnline() {
-            isOnline = true;
-            showSyncStatus('Back online - reconnecting...', 'pending');
-            
-            // Reinitialize Firebase when back online
-            setTimeout(() => {
-                initializeFirebase().catch(error => {
-                    console.error('Reconnection failed:', error);
-                    showSyncStatus('Reconnection failed - using offline mode', 'error');
-                });
-            }, 1000);
-        }
-
+		function handleOnline() {
+			isOnline = true;
+			showSyncStatus('Back online - reconnecting...', 'pending');
+			connectToFirebase();
+		}
         function handleOffline() {
             isOnline = false;
             showSyncStatus('You are offline - changes saved locally', 'error');
@@ -3524,86 +3343,79 @@
 
         // ========== INITIALIZATION ==========
 
-        async function initializeApp() {
-            showLoading('Starting application...');
-            
-            // Set up network listeners
-            window.addEventListener('online', handleOnline);
-            window.addEventListener('offline', handleOffline);
-            
-            try {
-                // Simple Firebase initialization
-                if (!firebase.apps.length) {
-                    firebase.initializeApp(firebaseConfig);
-                }
-                
-                // Test connection with timeout
-                const connectionTest = new Promise((resolve, reject) => {
-                    const timeout = setTimeout(() => reject(new Error('Connection timeout')), 10000);
-                    db.collection('connection_test').doc('test').get()
-                        .then(() => {
-                            clearTimeout(timeout);
-                            resolve();
-                        })
-                        .catch(reject);
-                });
-                
-                await connectionTest;
-                console.log('Firebase connection successful');
-                
-                // Load data
-                await loadAllData();
-                
-                // Initialize application
-                initializePayments();
-                renderYears();
-                renderDonations();
-                renderExpenses();
-                updateDashboard();
-                updateReports();
-                updateFinance();
-                updateLoginStatus();
-                
-                hideLoading();
-                showSyncStatus('Application ready!', 'success');
-                
-            } catch (error) {
-                console.error('App initialization failed:', error);
-                // Continue with default data
-                initializePayments();
-                renderYears();
-                updateDashboard();
-                hideLoading();
-                showSyncStatus('Using offline mode', 'warning');
-            }
-        }
+		async function initializeApp() {
+			showLoading('Starting application...');
+			
+			// Set up network listeners
+			window.addEventListener('online', handleOnline);
+			window.addEventListener('offline', handleOffline);
+			
+			// Always initialize with default data first
+			console.log('Initializing with default data...');
+			initializePayments();
+			renderYears();
+			renderDonations();
+			renderExpenses();
+			updateDashboard();
+			updateReports();
+			updateFinance();
+			updateLoginStatus();
+			
+			hideLoading();
+			showSyncStatus('Application loaded!', 'success');
+			
+			// Then try to connect to Firebase in the background
+			if (navigator.onLine) {
+				connectToFirebase();
+			}
+		}
+
+		// Add this NEW function right after initializeApp():
+		async function connectToFirebase() {
+			try {
+				console.log('Attempting Firebase connection...');
+				
+				// Enable offline persistence
+				try {
+					await db.enablePersistence({ synchronizeTabs: true });
+				} catch (err) {
+					console.warn('Persistence warning:', err.code);
+				}
+				
+				// Test connection with short timeout
+				await Promise.race([
+					db.collection('settings').doc('appSettings').get(),
+					new Promise((_, reject) => setTimeout(() => reject(new Error('Connection timeout')), 8000))
+				]);
+				
+				console.log('Firebase connected!');
+				firebaseInitialized = true;
+				
+				// Now load data from Firebase
+				await loadAllData();
+				
+				// Re-render everything with loaded data
+				renderYears();
+				renderDonations();
+				renderExpenses();
+				updateDashboard();
+				updateReports();
+				updateFinance();
+				
+				showSyncStatus('Synced with cloud database!', 'success');
+				
+			} catch (error) {
+				console.error('Firebase connection failed:', error);
+				firebaseInitialized = false;
+				showSyncStatus('Running in offline mode', 'warning');
+			}
+		}
 
         // Initialize the application
         initializeApp();
 
         // Auto-save every 30 seconds
         setInterval(saveData, 30000);
-
-        // Temporary debug
-        setTimeout(async () => {
-            console.log('=== FIREBASE DEBUG INFO ===');
-            console.log('Firebase apps:', firebase.apps.length);
-            console.log('Is online:', navigator.onLine);
-            
-            try {
-                const test = await db.collection('members').limit(1).get();
-                console.log('Members collection accessible:', !test.empty);
-                
-                const years = await db.collection('years').get();
-                console.log('Years found:', years.size);
-                
-                years.forEach(doc => {
-                    console.log('Year:', doc.id, doc.data());
-                });
-            } catch (error) {
-                console.error('Debug test failed:', error);
-            }
-        }, 2000);
     </script>
 </body>
 </html>
